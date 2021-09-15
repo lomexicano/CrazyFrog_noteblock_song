@@ -1,0 +1,77 @@
+$${
+
+log("&f&l[&2&lMA&f&lC&4&lRO&f&l] &fStarting saving process...");
+
+#x_inf = XPOS - 5;
+#x_sup = XPOS + 5;
+
+#y_inf = YPOS - 4;
+#y_sup = YPOS + 1;
+
+#z_inf = ZPOS - 0;
+#z_sup = ZPOS - 28;
+
+#x_save = XPOS;
+#y_save = YPOS;
+#z_save = ZPOS;
+unsafe(400);
+	for(#y,-4,1);
+		for(#z,0,-28);
+			for(#x,-5,5);
+
+				#getid_x = #x_save + #x;
+				#getid_y = #y_save + #y;
+				#getid_z = #z_save + #z;
+
+				getid(%#getid_x%,%#getid_y%,%#getid_z%,&id,#numeric_data,&data);
+
+				if(&id != "air");
+					setlabel("crazyfrog_saver","&fX: &a%#x%&8\n&eY: &b%#y%&8\n&6X: &c%#z%&8\n&2%&id%&8:&7%#data%");
+
+					if(&id == "noteblock");
+						unset(@&blockdata);
+						exec("echo.txt","ECHO","/blockdata %#getid_x% %#getid_y% %#getid_z% {Invalid:0}");
+						do();
+						until(@&blockdata);
+
+						logto("song.txt","push(&build[],\"%#x% %#y% %#z% %&id% 0 0 {%@&blockdata%}\");");
+					elseif(&id == "stone_button");
+						match("%&data%","facing=(\w+)\,",{&facing});
+						if(&facing == "north");
+							set(#data,1);
+						elseif(&facing == "east");
+							set(#data,2);
+						elseif(&facing == "south");
+							set(#data,3);
+						else;
+							set(#data,4);
+						endif;
+						logto("song.txt","push(&build[],\"%#x% %#y% %#z% %&id% %#data%\");");
+					elseif(&id == "unpowered_repeater");
+						match("%&data%","delay=(\d+)\,facing=(\w+)\,",{#delay,&facing});
+						dec(#delay,1);
+						#data = #delay * 4;
+						if(&facing == "south");
+							inc(#data,0);
+						elseif(&facing == "west");
+							inc(#data,1);
+						elseif(&facing == "north");
+							inc(#data,2);
+						else;
+							inc(#data,3);
+						endif;
+						logto("song.txt","push(&build[],\"%#x% %#y% %#z% %&id% %#data%\");");
+					else;
+						logto("song.txt","push(&build[],\"%#x% %#y% %#z% %&id% %#numeric_data%\");");
+					endif;
+				endif;
+			next;
+		next;
+	next;
+endunsafe;
+						
+log("&f&l[&2&lMA&f&lC&4&lRO&f&l] &aDone!");
+setlabel("crazyfrog_saver","");
+
+
+}$$

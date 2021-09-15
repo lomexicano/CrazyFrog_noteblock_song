@@ -1,0 +1,6 @@
+$${
+
+ifmatches("%CHATCLEAN%","\{(note:[^,]+),",@&blockdata,1);
+endif;
+
+}$$
